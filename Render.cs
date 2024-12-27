@@ -1,8 +1,9 @@
 ﻿using SFML.Graphics;
 using SFML.Window;
+
 public class Render
 {
-    public RenderWindow Window { get; set; }
+    public RenderWindow Window { get; private set; }
     private List<Drawable> drawables;
 
     public Render()
@@ -12,9 +13,12 @@ public class Render
         drawables = new List<Drawable>();
     }
 
-    public void AddDrawable(Drawable drawable)
+    public void AddDrawable(params Drawable[] drawablesToAdd)
     {
-        drawables.Add(drawable);
+        foreach (var drawable in drawablesToAdd)
+        {
+            drawables.Add(drawable);
+        }
     }
 
     public void Clear(Color color) => Window.Clear(color);

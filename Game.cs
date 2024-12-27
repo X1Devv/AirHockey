@@ -1,13 +1,23 @@
-﻿using SFML.Graphics;
-using SFML.System;
+﻿using SFML.System;
+using SFML.Graphics;
 
 public class Game
 {
     private Render render;
+    private Clock clock;
+    private Platform RadiantPlatform;
+    private Platform DirePlatform;
+    private Ball ball;
+    private Zone RadiantZone;
+    private Zone DireZone;
+
+    private int RadiantScore = 0;
+    private int DireScore = 0;
 
     public Game(Render render)
     {
         this.render = render;
+        clock = new Clock();
     }
 
     public void GameCycle()
@@ -16,53 +26,65 @@ public class Game
 
         while (render.IsOpen)
         {
-            render.DispatchEvents();
-
+            float deltaTime = clock.Restart().AsSeconds();
+            
             render.Clear(Color.White);
+            render.DispatchEvents();
+            
+            BallMove(deltaTime);
+            PlatformUpdate(deltaTime);
+            
+            CheckZones();
+
             render.Draw();
             render.Display();
         }
     }
 
-    public void BallMove()
+    public void BallMove(float deltaTime)
     {
-
+        ball.MoveBall(deltaTime);
     }
 
-    public void CanBallMove()
+    public void PlatformUpdate(float deltaTime)
     {
-
+        RadiantPlatform.Update(deltaTime, 1, ball);
+        DirePlatform.Update(deltaTime, 2, ball);
     }
 
-    private (int, int) CalcCenter()
+    public void CheckZones()
     {
-        return ((int)render.Window.Size.X / 2, (int)render.Window.Size.Y / 2);
+        if (RadiantZone.CheckBallInZone(ball))
+        {
+            DireScore++;
+            ResetBall();
+            Console.WriteLine($"Score> Radiant {RadiantScore} - {DireScore} Dire");
+        }
+
+        if (DireZone.CheckBallInZone(ball))
+        {
+            RadiantScore++;
+            ResetBall();
+            Console.WriteLine($"Score> Radiant {RadiantScore} - {DireScore} Dire");
+        }
+    }
+
+    public void ResetBall()
+    {
+        ball.ResetPosition();
     }
 
     public void CreateObjects()
     {
-        var DireZone = new RectangleShape(new Vector2f(100, 1000))
-        {
-            FillColor = Color.Red,
-            Position = new Vector2f(1100, 0)
-        };
+        RadiantZone = new Zone(new Vector2f(100, 1000), new Vector2f(0, 0), Color.Blue);
+        DireZone = new Zone(new Vector2f(100, 1000), new Vector2f(1100, 0), Color.Red);
 
-        var RadiantZone = new RectangleShape(new Vector2f(100, 1000))
-        {
-            FillColor = Color.Blue,
-            Position = new Vector2f(0, 0)
-        };
+        RadiantPlatform = new Platform(new Vector2f(30, 150), new Vector2f(200, 300), Color.Black);
+        DirePlatform = new Platform(new Vector2f(30, 150), new Vector2f(970, 300), Color.Black);
 
-        var Ball = new CircleShape(50)
-        {
-            FillColor = Color.Black,
-        };
+        ball = new Ball(render.Window);
 
-        (int x, int y) = CalcCenter();
-        Ball.Position = new Vector2f(x - Ball.Radius, y - Ball.Radius);
-        
-        render.AddDrawable(DireZone);
-        render.AddDrawable(RadiantZone);
-        render.AddDrawable(Ball);
+        render.AddDrawable(RadiantZone.Shape, DireZone.Shape, ball.Shape,
+            RadiantPlatform.Shape, DirePlatform.Shape);
     }
 }
