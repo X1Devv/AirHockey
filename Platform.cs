@@ -1,33 +1,26 @@
 ﻿using SFML.Graphics;
 using SFML.System;
-using SFML.Window;
 
 public class Platform
 {
     public RectangleShape Shape { get; private set; }
-    private float speed;
+    public float Speed { get; set; }
+    public bool IsRight { get; private set; }
 
-    public Platform(Vector2f size, Vector2f position, Color color, float speed = 200f)
+    public Platform(Vector2f size, Vector2f position, Color color, bool isRight, float speed = 200f)
     {
         Shape = new RectangleShape(size)
         {
             Position = position,
             FillColor = color,
         };
-        this.speed = speed;
+        this.Speed = speed;
+        this.IsRight = isRight;
     }
 
-    public void Update(float deltaTime, int PlatformId, Ball ball)
+    public void Update(float deltaTime, Vector2f input, Ball ball)
     {
-        switch (PlatformId)
-        {
-            case 1:
-                HandleMovement(deltaTime, Keyboard.Key.W, Keyboard.Key.S);
-                break;
-            case 2:
-                HandleMovement(deltaTime, Keyboard.Key.A, Keyboard.Key.D);
-                break;
-        }
+        Move(0, input.Y * Speed * deltaTime);
 
         if (Shape.Position.Y < 0)
             Shape.Position = new Vector2f(Shape.Position.X, 0);
@@ -38,21 +31,31 @@ public class Platform
         HandleBallCollision(ball);
     }
 
-
-    private void HandleMovement(float deltaTime, Keyboard.Key moveUpKey, Keyboard.Key moveDownKey)
+    public void Move(float x, float y)
     {
-        if (Keyboard.IsKeyPressed(moveUpKey))
-            Shape.Position = new Vector2f(Shape.Position.X, Shape.Position.Y - speed * deltaTime);
-        
-        if (Keyboard.IsKeyPressed(moveDownKey))
-            Shape.Position = new Vector2f(Shape.Position.X, Shape.Position.Y + speed * deltaTime);
+        Shape.Position += new Vector2f(x, y);
     }
 
     private void HandleBallCollision(Ball ball)
     {
-        if (Shape.GetGlobalBounds().Intersects(ball.Shape.GetGlobalBounds()))
-            ball.Speed = new Vector2f(-ball.Speed.X, ball.Speed.Y);
+        FloatRect platformBounds = Shape.GetGlobalBounds();
+        FloatRect ballBounds = ball.Shape.GetGlobalBounds();
+
+        if (platformBounds.Intersects(ballBounds))
+        {
+            if (IsRight)
+            {
+                if (ballBounds.Left + ballBounds.Width <= platformBounds.Left + 5 || ballBounds.Left >= platformBounds.Left + platformBounds.Width - 5)
+                    ball.Speed = new Vector2f(-ball.Speed.X, ball.Speed.Y);
+            }
+            else
+            {
+                if (ballBounds.Left + ballBounds.Width <= platformBounds.Left + 5 || ballBounds.Left >= platformBounds.Left + platformBounds.Width - 5)
+                    ball.Speed = new Vector2f(-ball.Speed.X, ball.Speed.Y);
+            }
+
+            if (ballBounds.Top + ballBounds.Height <= platformBounds.Top + 5 || ballBounds.Top >= platformBounds.Top + platformBounds.Height - 5)
+                ball.Speed = new Vector2f(ball.Speed.X, -ball.Speed.Y);
+        }
     }
-
-
 }
