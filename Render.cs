@@ -9,6 +9,7 @@ public class Render
     public Render()
     {
         Window = new RenderWindow(new VideoMode(1200, 600), "Air hockey");
+        Window.SetFramerateLimit(30);
         Window.Closed += (sender, e) => Window.Close();
         drawables = new List<Drawable>();
     }

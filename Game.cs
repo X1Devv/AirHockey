@@ -45,8 +45,6 @@ public class Game
 
             render.Draw();
             render.Display();
-            
-            Thread.Sleep(12);
         }
     }
 
