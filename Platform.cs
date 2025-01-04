@@ -5,7 +5,8 @@ public class Platform
 {
     public RectangleShape Shape { get; private set; }
     public float Speed { get; set; }
-    public bool IsRight { get; private set; }
+    public bool IsRight { get; set; }
+    public bool NeedToCollide { get; set; }
 
     public Platform(Vector2f size, Vector2f position, Color color, bool isRight, float speed = 200f)
     {
@@ -16,6 +17,7 @@ public class Platform
         };
         this.Speed = speed;
         this.IsRight = isRight;
+        this.NeedToCollide = true;
     }
 
     public void Update(float deltaTime, Vector2f input, Ball ball)
@@ -41,21 +43,16 @@ public class Platform
         FloatRect platformBounds = Shape.GetGlobalBounds();
         FloatRect ballBounds = ball.Shape.GetGlobalBounds();
 
-        if (platformBounds.Intersects(ballBounds))
+        if (platformBounds.Intersects(ballBounds) && NeedToCollide)
         {
-            if (IsRight)
-            {
-                if (ballBounds.Left + ballBounds.Width <= platformBounds.Left + 5 || ballBounds.Left >= platformBounds.Left + platformBounds.Width - 5)
-                    ball.Speed = new Vector2f(-ball.Speed.X, ball.Speed.Y);
-            }
-            else
-            {
-                if (ballBounds.Left + ballBounds.Width <= platformBounds.Left + 5 || ballBounds.Left >= platformBounds.Left + platformBounds.Width - 5)
-                    ball.Speed = new Vector2f(-ball.Speed.X, ball.Speed.Y);
-            }
+            ball.Speed = new Vector2f(-ball.Speed.X, ball.Speed.Y);
 
-            if (ballBounds.Top + ballBounds.Height <= platformBounds.Top + 5 || ballBounds.Top >= platformBounds.Top + platformBounds.Height - 5)
+            if (ballBounds.Top < platformBounds.Top || ballBounds.Top + ballBounds.Height > platformBounds.Top + platformBounds.Height)
                 ball.Speed = new Vector2f(ball.Speed.X, -ball.Speed.Y);
+
+            NeedToCollide = false;
         }
+        else if (!platformBounds.Intersects(ballBounds))
+            NeedToCollide = true;//дуже жорсткий фікс в плані фізики, але воно працює
     }
 }
