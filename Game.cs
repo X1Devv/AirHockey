@@ -94,8 +94,8 @@ public class Game
         RadiantZone = new Zone(new Vector2f(100, 1000), new Vector2f(0, 0), Color.Blue);
         DireZone = new Zone(new Vector2f(100, 1000), new Vector2f(1100, 0), Color.Red);
 
-        RadiantPlatform = new Platform(new Vector2f(30, 150), new Vector2f(200, 300), Color.Black, isRight: false);
-        DirePlatform = new Platform(new Vector2f(30, 150), new Vector2f(970, 300), Color.Black, isRight: true);
+        RadiantPlatform = new Platform(new Vector2f(30, 150), new Vector2f(200, 300), Color.Black);
+        DirePlatform = new Platform(new Vector2f(30, 150), new Vector2f(970, 300), Color.Black);
 
 
         ball = new Ball(render.Window);

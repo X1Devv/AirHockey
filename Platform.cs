@@ -5,10 +5,9 @@ public class Platform
 {
     public RectangleShape Shape { get; private set; }
     public float Speed { get; set; }
-    public bool IsRight { get; set; }
     public bool NeedToCollide { get; set; }
 
-    public Platform(Vector2f size, Vector2f position, Color color, bool isRight, float speed = 200f)
+    public Platform(Vector2f size, Vector2f position, Color color, float speed = 200f)
     {
         Shape = new RectangleShape(size)
         {
@@ -16,7 +15,6 @@ public class Platform
             FillColor = color,
         };
         this.Speed = speed;
-        this.IsRight = isRight;
         this.NeedToCollide = true;
     }
 
