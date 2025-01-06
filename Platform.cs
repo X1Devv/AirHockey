@@ -4,23 +4,23 @@ using SFML.System;
 public class Platform
 {
     public RectangleShape Shape { get; private set; }
-    public float Speed { get; set; }
+    public float Velocity { get; set; }
     public bool NeedToCollide { get; set; }
 
-    public Platform(Vector2f size, Vector2f position, Color color, float speed = 200f)
+    public Platform(Vector2f size, Vector2f position, Color color, float velocity = 200f)
     {
         Shape = new RectangleShape(size)
         {
             Position = position,
             FillColor = color,
         };
-        this.Speed = speed;
+        this.Velocity = velocity;
         this.NeedToCollide = true;
     }
 
     public void Update(float deltaTime, Vector2f input, Ball ball)
     {
-        Move(0, input.Y * Speed * deltaTime);
+        Move(0, input.Y * Velocity * deltaTime);
 
         if (Shape.Position.Y < 0)
             Shape.Position = new Vector2f(Shape.Position.X, 0);
@@ -43,14 +43,14 @@ public class Platform
 
         if (platformBounds.Intersects(ballBounds) && NeedToCollide)
         {
-            ball.Speed = new Vector2f(-ball.Speed.X, ball.Speed.Y);
+            ball.Velocity = new Vector2f(-ball.Velocity.X, ball.Velocity.Y);
 
             if (ballBounds.Top < platformBounds.Top || ballBounds.Top + ballBounds.Height > platformBounds.Top + platformBounds.Height)
-                ball.Speed = new Vector2f(ball.Speed.X, -ball.Speed.Y);
+                ball.Velocity = new Vector2f(ball.Velocity.X, -ball.Velocity.Y);
 
             NeedToCollide = false;
         }
         else if (!platformBounds.Intersects(ballBounds))
-            NeedToCollide = true;//дуже жорсткий фікс в плані фізики, але воно працює
+            NeedToCollide = true;
     }
 }
