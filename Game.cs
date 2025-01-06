@@ -5,6 +5,7 @@ public class Game
 {
     private Render render;
     private Clock clock;
+    public RenderWindow Window { get; private set; }
 
     private Platform RadiantPlatform;
     private Platform DirePlatform;
@@ -22,40 +23,49 @@ public class Game
     public Game(Render render)
     {
         this.render = render;
+        Window = render.Window;
         clock = new Clock();
         input = new Input();
+        Window.Closed += WindowClosed;
     }
 
     public void GameCycle()
     {
         CreateObjects();
 
-        while (render.IsOpen)
+        while (Window.IsOpen)
         {
-            float deltaTime = clock.Restart().AsSeconds();
+            DispatchEvents();
             (Vector2f radiantInput, Vector2f direInput) = GetInput();
-
-            render.Clear(Color.White);
-            render.DispatchEvents();
-
-            BallMove(deltaTime);
-            PlatformUpdate(deltaTime, radiantInput, direInput);
-
-            CheckZones();
-
-            render.Draw();
-            render.Display();
+            Update(clock.Restart().AsSeconds(), radiantInput, direInput);
+            Render();
         }
+    }
+
+    private void Update(float deltaTime, Vector2f radiantInput, Vector2f direInput)
+    {
+        BallMove(deltaTime);
+        PlatformUpdate(deltaTime, radiantInput, direInput);
+        CheckZones();
+    }
+
+    private void Render()
+    {
+        render.Clear(Color.White);
+        render.Draw();
+        render.Display();
     }
 
     public void BallMove(float deltaTime)
     {
         ball.MoveBall(deltaTime);
     }
+
     public void ResetBall()
     {
         ball.ResetPosition();
     }
+
     public (Vector2f, Vector2f) GetInput()
     {
         Vector2f radiantInput = input.GetPlatformInput(1);
@@ -68,7 +78,6 @@ public class Game
         RadiantPlatform.Update(deltaTime, radiantInput, ball);
         DirePlatform.Update(deltaTime, direInput, ball);
     }
-
 
     public void CheckZones()
     {
@@ -95,10 +104,20 @@ public class Game
         RadiantPlatform = new Platform(new Vector2f(30, 150), new Vector2f(200, 300), Color.Black);
         DirePlatform = new Platform(new Vector2f(30, 150), new Vector2f(970, 300), Color.Black);
 
-
         ball = new Ball(render.Window);
 
         render.AddDrawable(RadiantZone.Shape, DireZone.Shape, ball.Shape,
             RadiantPlatform.Shape, DirePlatform.Shape);
+    }
+
+    public void DispatchEvents()
+    {
+        Window.DispatchEvents();
+    }
+
+    private void WindowClosed(object sender, EventArgs e)
+    {
+        RenderWindow w = (RenderWindow)sender;
+        w.Close();
     }
 }

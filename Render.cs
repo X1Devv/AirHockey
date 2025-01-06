@@ -6,11 +6,10 @@ public class Render
     public RenderWindow Window { get; private set; }
     private List<Drawable> drawables;
 
-    public Render()
+    public Render(VideoMode videoMode, string title)
     {
-        Window = new RenderWindow(new VideoMode(1200, 600), "Air hockey");
-        Window.SetFramerateLimit(30);
-        Window.Closed += (sender, e) => Window.Close();
+        Window = new RenderWindow(videoMode, title);
+        Window.SetFramerateLimit(60);
         drawables = new List<Drawable>();
     }
 
@@ -33,8 +32,6 @@ public class Render
             Window.Draw(drawable);
         }
     }
-
-    public void DispatchEvents() => Window.DispatchEvents();
 
     public bool IsOpen => Window.IsOpen;
 }

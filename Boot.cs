@@ -1,8 +1,9 @@
 ﻿class Boot
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        Render render = new Render();
+        Render render = WindowInitialize.InitializeRenderWindow();
+
         Game game = new Game(render);
 
         game.GameCycle();
